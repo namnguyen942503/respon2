@@ -1,0 +1,14 @@
+{
+    "DEV_HANA": {
+        "object_owner": {
+            "roles": [
+                "CCROLE"
+            ]
+        },
+        "application_user": {
+            "roles": [
+                "CCROLE"
+            ]
+        }
+    }
+}

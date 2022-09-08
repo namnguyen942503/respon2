@@ -1,0 +1,108 @@
+PROCEDURE "dim_process"( 
+    OUT EX_TABLE_TEST TABLE(
+        TYPE1 NVARCHAR(200),
+        FUNEL NVARCHAR(200),
+        CHANEL NVARCHAR(200),
+        TOTAL1 DECIMAL(20,2),
+        YEAR_BACK DECIMAL(20,2),
+        YEAR1 DECIMAL(20,2),
+        NGAY_01 DECIMAL(20,2),
+        NGAY_02 DECIMAL(20,2),
+        NGAY_03 DECIMAL(20,2)
+
+              )
+)
+   LANGUAGE SQLSCRIPT
+   SQL SECURITY INVOKER
+   --DEFAULT SCHEMA <default_schema_name>
+   READS SQL DATA AS
+BEGIN
+Declare code NVARCHAR(50);
+Declare code2 NVARCHAR(50);
+Declare code3 NVARCHAR(50);
+declare nam NVARCHAR(50);
+declare thang nvarchar(50);
+declare thang_trc date;
+CODE := current_date;
+--code := to_char(to_date(code,'yyyy-mm-dd'),'yyyy-mm-dd'  );
+--code2 := to_char(to_date(code,'yyyy-mm-dd'),'yyyy-mm-02'  );
+--code3 := to_char(to_date(code,'yyyy-mm-dd'),'yyyy-mm-03'  );
+
+nam := to_char(to_date(code,'yyyy-mm-dd'),'yyyy'  );
+thang := to_char(to_date(code,'yyyy-mm-dd'),'mm'  );
+
+code = nam || '-' || thang || '-01';
+code2 = nam || '-' || thang || '-02';
+code3 = nam || '-' || thang || '-03';
+
+thang := thang - 1;
+
+thang_trc = nam || '-' || thang || '-01';
+
+
+total = select count(*) as total1, LEAD_TYPE,FUNEL,CHANNEL_CODE
+FROM "Synonym_2"
+where ngay < current_date
+group by LEAD_TYPE,FUNEL,CHANNEL_CODE
+;
+thang1 = select count(*) as thang1, LEAD_TYPE,FUNEL,CHANNEL_CODE
+FROM "Synonym_2"
+where ngay < code 
+and ngay >= thang_trc
+group by LEAD_TYPE,FUNEL,CHANNEL_CODE
+;
+thang_nay = select count(*) as thang, LEAD_TYPE,FUNEL,CHANNEL_CODE
+FROM "Synonym_2"
+where ngay < current_date
+and ngay >= code 
+group by LEAD_TYPE,FUNEL,CHANNEL_CODE
+;
+ngay01 = select count(*) as ngay01, LEAD_TYPE,FUNEL,CHANNEL_CODE
+FROM "Synonym_2"
+where ngay = code 
+group by LEAD_TYPE,FUNEL,CHANNEL_CODE
+;
+ngay02 = select count(*) as ngay02, LEAD_TYPE,FUNEL,CHANNEL_CODE
+FROM "Synonym_2"
+where ngay = code2
+group by LEAD_TYPE,FUNEL,CHANNEL_CODE
+;
+ngay03 = select count(*) as ngay03, LEAD_TYPE,FUNEL,CHANNEL_CODE
+FROM "Synonym_2"
+where ngay = code3 
+group by LEAD_TYPE,FUNEL,CHANNEL_CODE
+;
+
+
+EX_TABLE_TEST = SELECT TOTAL.LEAD_TYPE AS TYPE1,  TOTAL.FUNEL AS FUNEL, 
+ TOTAL.CHANNEL_CODE AS CHANEL,  TOTAL.TOTAL1 AS TOTAL1, THANG1.thang1 AS YEAR_BACK,
+ THANG_NAY.THANG AS YEAR1, NGAY01.NGAY01 AS NGAY_01, NGAY02.NGAY02 AS NGAY_02, NGAY03.NGAY03 AS NGAY_03
+FROM "Synonym_2" AS XXX
+LEFT OUTER JOIN  :TOTAL AS TOTAL
+ON XXX.LEAD_TYPE = TOTAL.LEAD_TYPE
+AND XXX.FUNEL = TOTAL.FUNEL
+AND XXX.CHANNEL_CODE = TOTAL.CHANNEL_CODE
+LEFT OUTER JOIN :THANG1 AS thang1
+ON XXX.LEAD_TYPE = THANG1.LEAD_TYPE
+AND XXX.FUNEL = THANG1.FUNEL
+AND XXX.CHANNEL_CODE = THANG1.CHANNEL_CODE
+LEFT OUTER JOIN :THANG_NAY AS THANG_NAY
+ON XXX.LEAD_TYPE = THANG_NAY.LEAD_TYPE
+AND XXX.FUNEL = THANG_NAY.FUNEL
+AND XXX.CHANNEL_CODE = THANG_NAY.CHANNEL_CODE
+LEFT OUTER JOIN :NGAY01 AS NGAY01
+ON XXX.LEAD_TYPE = NGAY01.LEAD_TYPE
+AND XXX.FUNEL = NGAY01.FUNEL
+AND XXX.CHANNEL_CODE = NGAY01.CHANNEL_CODE
+LEFT OUTER JOIN :NGAY02 AS NGAY02
+ON XXX.LEAD_TYPE = NGAY02.LEAD_TYPE
+AND XXX.FUNEL = NGAY02.FUNEL
+AND XXX.CHANNEL_CODE = NGAY02.CHANNEL_CODE
+LEFT OUTER JOIN :NGAY03 AS NGAY03
+ON XXX.LEAD_TYPE = NGAY03.LEAD_TYPE
+AND XXX.FUNEL = NGAY03.FUNEL
+AND XXX.CHANNEL_CODE = NGAY03.CHANNEL_CODE
+ORDER BY XXX.LEAD_TYPE,XXX.FUNEL,XXX.CHANNEL_CODE;
+
+--INSERT INTO "com.sap::SAC_TEST" VALUES(TYPE1, FUNEL, CHANEL, TOTAL1, YEAR_BACK) 
+END

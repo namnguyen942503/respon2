@@ -1,0 +1,26 @@
+{
+  "com.sap::DIM_CHANNEL": {
+    "target": {
+      "object": "DIM_CHANNEL",
+      "schema": "DI_CONN"
+    }
+  },
+  "com.sap::REGIONS": {
+    "target": {
+      "object": "REGIONS",
+      "schema": "PLAIN"
+    }
+  },
+  "Synonym_2": {
+    "target": {
+      "object": "TRAN_DEMO",
+      "schema": "DI_CONN"
+    }
+  },
+  "com.sap::SAC_TEST": {
+    "target": {
+      "object": "SAC_TEST",
+      "schema": "DI_CONN"
+    }
+  }
+}
